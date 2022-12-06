@@ -34,6 +34,12 @@ class Eye:
         return (int((p1[0]+p2[0])/2),int((p1[1]+p2[1])/2))
 
     def get_eye_region(self,points):
+        """Returns Eye region from points
+        Arguments:
+            points: Eye points
+
+        """
+
         eye_region = np.array([ (self.__landmarks.part(points[0]).x,self.__landmarks.part(points[0]).y),
                             (self.__landmarks.part(points[1]).x,self.__landmarks.part(points[1]).y),
                             (self.__landmarks.part(points[2]).x,self.__landmarks.part(points[2]).y),
@@ -85,13 +91,33 @@ class Eye:
                                         mid_point_up[1]-mid_point_down[1])
         return vertical_distance
 
-class blink:
+class Blink:
     def __init__(self,blink_ratio):
         self.blink_ratio = blink_ratio
+        self.__threshold = 5.5
 
-    
+    def set_blinking_threshold(self,blink_threshold):
+        self.__threshold = blink_threshold
+
+    def is_blinking(self):       
+        if self.blink_ratio > self.__threshold:
+            return True
+        return False
+
+    def set_closed_eyes_frame(self,closed_eyes_frame):
+        self.__closed_eyes_frame = closed_eyes_frame
+
+    def get_closed_eyes_frame(self):
+        return self.__closed_eyes_frame
+
 
 if __name__ == "__main__":
+    TOTAL_BLINKS =0
+    BLINKS_COUNTER =0
+    # last_order="IDLE"
+    # constants
+    CLOSED_EYES_FRAME =15
+
     cap = cv2.VideoCapture(1)
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -116,24 +142,24 @@ if __name__ == "__main__":
             print(left_eye_ratio)
             right_eye_ratio = right_eye.blink_ratio()
             blinking_ratio = (left_eye_ratio + right_eye_ratio) / 2
-            
-            # if blinking_ratio > 5.7:
-            #     BLINKS_COUNTER +=1
-            #     cv2.putText(frame, "BLINKING", (50, 150), font,3,(255,0,0))
+            blink = Blink(blinking_ratio)
+            if blink.is_blinking():
+                BLINKS_COUNTER +=1
+                cv2.putText(frame, "BLINKING", (50, 150), font,3,(255,0,0))
                 
-            # else:
-            #     if BLINKS_COUNTER>CLOSED_EYES_FRAME:
-            #         TOTAL_BLINKS +=1
-            #         BLINKS_COUNTER =0
-            # cv2.putText(frame,  f'Total Blinks: {TOTAL_BLINKS}',(50, 350), font, 2, (0, 0, 255), 3)
+            else:
+                if BLINKS_COUNTER>CLOSED_EYES_FRAME:
+                    TOTAL_BLINKS +=1
+                    BLINKS_COUNTER =0
+            cv2.putText(frame,  f'Total Blinks: {TOTAL_BLINKS}',(50, 350), font, 2, (0, 0, 255), 3)
 
 
             # left_ratio = get_blink_ratio(LEFT_EYE_POINTS,landmarks)
             # right_ratio = get_blink_ratio(RIGHT_EYE_POINTS,landmarks)
             # blink_ratio = (left_ratio+right_ratio)/2
             # # print(blink_ratio)
-            if(blinking_ratio>5.7):
-                cv2.putText(frame,"Blinking",(50,150),font,3,(255,0,0))
+            # if(blink.is_blinking()):
+            #     cv2.putText(frame,"Blinking",(50,150),font,3,(255,0,0))
             # #Need Calibration
             # #gaze_ratio = (get_gaze_ratio(RIGHT_EYE_POINTS,landmarks)+get_gaze_ratio(LEFT_EYE_POINTS,landmarks))/2
             # right_rat=get_gaze_ratio_v2(RIGHT_EYE_POINTS,landmarks,frame,gray,mask)
