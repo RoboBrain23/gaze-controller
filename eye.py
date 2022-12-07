@@ -119,13 +119,13 @@ class Gaze:
     def get_gaze_ratio(self):
         eye_threshold = self.get_eye_threshold(self.eye_region)
         height,width = eye_threshold.shape
-        left_side_eye_threshold = eye_threshold[0:height,0:int(width/3)]
+        left_side_eye_threshold = eye_threshold[0:height,0:int(width/4)]
         left_side_eye_threshold_white = cv2.countNonZero(left_side_eye_threshold)
 
-        center_side_eye_threshold = eye_threshold[0:height,int(width/3):int(2*width/3)]
+        center_side_eye_threshold = eye_threshold[0:height,int(width/4):int(3*width/4)]
         center_side_eye_threshold_white = cv2.countNonZero(center_side_eye_threshold)
 
-        right_side_eye_threshold = eye_threshold[0:height,int(2*width/3):]
+        right_side_eye_threshold = eye_threshold[0:height,int(3*width/4):]
         right_side_eye_threshold_white = cv2.countNonZero(right_side_eye_threshold)
 
         #left
