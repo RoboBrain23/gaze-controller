@@ -168,9 +168,14 @@ class Gaze:
 if __name__ == "__main__":
     TOTAL_BLINKS =0
     BLINKS_COUNTER =0
+    LEFT_COUNTER = 0
+    RIGHT_COUNTER = 0
+    CENTER_COUNTER = 0
+
     # last_order="IDLE"
     # constants
     CLOSED_EYES_FRAME =12
+    EYE_DIRECTION_FRAME =20
 
     cap = cv2.VideoCapture(1)
     detector = dlib.get_frontal_face_detector()
@@ -213,22 +218,56 @@ if __name__ == "__main__":
                 TOTAL_BLINKS +=1
                 BLINKS_COUNTER = 0
 
+
+
             cv2.putText(frame,  f'Total Blinks: {TOTAL_BLINKS}',(50, 350), font, 2, (0, 0, 255), 3)
 
             gaze_right = Gaze(right_eye.get_eye_region(),mask,gray)
             gaze_left = Gaze(left_eye.get_eye_region(),mask,gray)
             gaze_ratio = math.ceil((gaze_right.get_gaze_ratio()+gaze_left.get_gaze_ratio())/2)
-            if gaze_ratio == 2:
-                cv2.putText(frame, "STATE : RIGHT", (350, 50), font, 1, (0, 0, 255), 3)
-            elif gaze_ratio == 1:
-                cv2.putText(frame, "STATE : CENTER", (350, 50), font, 1, (0, 0, 255), 3)
-            else:
-                # LEFT_COUNTER+=1
-                cv2.putText(frame, "STATE : LEFT", (350, 50), font, 1, (0, 0, 255), 3)
+            # if gaze_ratio == 2:
+            #     cv2.putText(frame, "STATE : RIGHT", (350, 50), font, 1, (0, 0, 255), 3)
+            # elif gaze_ratio == 1:
+            #     cv2.putText(frame, "STATE : CENTER", (350, 50), font, 1, (0, 0, 255), 3)
+            # else:
+            #     # LEFT_COUNTER+=1
+            #     cv2.putText(frame, "STATE : LEFT", (350, 50), font, 1, (0, 0, 255), 3)
+            
+            if TOTAL_BLINKS==2 or TOTAL_BLINKS==3:
+                if gaze_ratio == 0:
+                    LEFT_COUNTER +=1
+                    cv2.putText(frame, "STATE : LEFT", (50, 100), font, 1, (0, 0, 255), 3)
+                    if LEFT_COUNTER>EYE_DIRECTION_FRAME: #frame=20
+                        RIGHT_COUNTER =0
+                        LEFT_COUNTER =0
+                        CENTER_COUNTER =0
+                        print(f"Left")
+                    # last_order= "LEFT"
+                elif gaze_ratio == 2:
+                    RIGHT_COUNTER +=1
+                    cv2.putText(frame, "STATE : RIGHT", (50, 100), font, 1, (0, 0, 255), 3)
+                    if RIGHT_COUNTER>EYE_DIRECTION_FRAME:
+                        RIGHT_COUNTER =0
+                        LEFT_COUNTER =0
+                        CENTER_COUNTER =0
+                        print('right')
+                        # last_order= "RIGHT"
+                elif gaze_ratio == 1:
+                    CENTER_COUNTER +=1
+                    cv2.putText(frame, "STATE : CENTER", (50, 100), font, 1, (0, 0, 255), 3)
+                    if CENTER_COUNTER>EYE_DIRECTION_FRAME:
+                        RIGHT_COUNTER =0
+                        LEFT_COUNTER =0
+                        CENTER_COUNTER =0
+                        print('forward')
+            if TOTAL_BLINKS== 4:
+                TOTAL_BLINKS=0
+
         cv2.imshow('frame',frame)
         # cv2.imshow('mask',mask)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+        
 
     cap.release()
     cv2.destroyAllWindows()
