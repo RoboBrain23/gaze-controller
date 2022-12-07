@@ -4,10 +4,13 @@ import cv2,dlib
 
 
 class Eye:
+    """
+    This class creates a new frame to isolate the eye and
+    get eye daimintions 
+    """
+
     LEFT_EYE_POINTS = [36, 37, 38, 39, 40, 41]
     RIGHT_EYE_POINTS = [42, 43, 44, 45, 46, 47]
-    FONT = cv2.FONT_HERSHEY_SIMPLEX
-    MODEL = "shape_predictor_68_face_landmarks.dat"
 
     def __init__(self, frame,side,landmarks):
         self.__frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
@@ -17,9 +20,6 @@ class Eye:
         elif self.__side.lower() == "right":
             self.__eye = self.RIGHT_EYE_POINTS
         self.__landmarks = landmarks
-        # self.__detector = None
-        # self.__predictor = None
-        # self.mask = None
 
 
     @staticmethod
@@ -35,6 +35,7 @@ class Eye:
 
     def get_eye_region(self):
         """Returns Eye region from points
+
         Arguments:
             points: Eye points
         """
@@ -47,22 +48,6 @@ class Eye:
                             (self.__landmarks.part(points[5]).x,self.__landmarks.part(points[5]).y)],np.int32)
         
         return eye_region
-
-    def __analysis(self,frame):
-        self.__detector = dlib.get_frontal_face_detector()
-        self.__predictor = dlib.shape_predictor(self.MODEL)
-        faces = self.__detector(self.__frame)
-        height,width,_ = frame.shape
-        self.mask = np.zeros((height,width),dtype=np.uint8)
-
-    def blink_ratio(self):
-        """Returns blinking ratio
-        """
-
-        horizontal_distance = self.get_eye_width()
-        vertical_distance = self.get_eye_height()
-        ratio = horizontal_distance/vertical_distance
-        return ratio
 
     def get_eye_width(self):
         """Returns Width of Eye
@@ -91,25 +76,32 @@ class Eye:
         return vertical_distance
 
 class Blink:
+    """
+    This class deals with eye blinking
+    """
+
     def __init__(self,blink_ratio):
         self.blink_ratio = blink_ratio
         self.__threshold = 5.5
 
     def set_blinking_threshold(self,blink_threshold):
+        """set eye blinking threshold
+
+        Arguments:
+            blinking threshold : blink_threshold
+        """
         self.__threshold = blink_threshold
 
     def is_blinking(self):       
+        """Check if the eye is blinking"""
         if self.blink_ratio > self.__threshold:
             return True
         return False
 
-    def set_closed_eyes_frame(self,closed_eyes_frame):
-        self.__closed_eyes_frame = closed_eyes_frame
-
-    def get_closed_eyes_frame(self):
-        return self.__closed_eyes_frame
-
 class Gaze:
+    """
+    This class deals with eye gazing
+    """
     def __init__(self,eye_region,mask,gray):
         self.eye_region = eye_region
         self.__threshold = 42
@@ -148,7 +140,6 @@ class Gaze:
 
 
     def get_eye_threshold(self,eye_region):
-        # eye_region = get_eye_region(points,landmarks)
         min_x,max_x,min_y,max_y = self.get_min_max_eye_region()
         cv2.polylines(self.mask,[eye_region],True,0,5)
         cv2.fillPoly(self.mask,[eye_region],255)
@@ -176,11 +167,14 @@ if __name__ == "__main__":
     # constants
     CLOSED_EYES_FRAME =10
     EYE_DIRECTION_FRAME =20
+    MODEL = "shape_predictor_68_face_landmarks.dat"
+    FONT = cv2.FONT_HERSHEY_SIMPLEX
 
     cap = cv2.VideoCapture(1)
     detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-    font = cv2.FONT_HERSHEY_SIMPLEX
+    predictor = dlib.shape_predictor(MODEL)
+    
+
     while True:
         ret, frame = cap.read()
         frame= cv2.flip(frame, 1)
@@ -205,7 +199,7 @@ if __name__ == "__main__":
             blink.set_blinking_threshold(5.3)
             if blink.is_blinking():
                 is_closed = True
-                cv2.putText(frame, "BLINKING", (50, 150), font,3,(255,0,0))
+                cv2.putText(frame, "BLINKING", (50, 150), FONT,3,(255,0,0))
             else:
                 is_closed = False
 
@@ -220,7 +214,7 @@ if __name__ == "__main__":
 
 
 
-            cv2.putText(frame,  f'Total Blinks: {TOTAL_BLINKS}',(50, 350), font, 2, (0, 0, 255), 3)
+            cv2.putText(frame,  f'Total Blinks: {TOTAL_BLINKS}',(50, 350), FONT, 2, (0, 0, 255), 3)
 
             gaze_right = Gaze(right_eye.get_eye_region(),mask,gray)
             gaze_left = Gaze(left_eye.get_eye_region(),mask,gray)
@@ -236,7 +230,7 @@ if __name__ == "__main__":
             if TOTAL_BLINKS==2 or TOTAL_BLINKS==3:
                 if gaze_ratio == 0:
                     LEFT_COUNTER +=1
-                    cv2.putText(frame, "STATE : LEFT", (50, 100), font, 1, (0, 0, 255), 3)
+                    cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
                     if LEFT_COUNTER>EYE_DIRECTION_FRAME: #frame=20
                         RIGHT_COUNTER =0
                         LEFT_COUNTER =0
@@ -245,7 +239,7 @@ if __name__ == "__main__":
                     # last_order= "LEFT"
                 elif gaze_ratio == 2:
                     RIGHT_COUNTER +=1
-                    cv2.putText(frame, "STATE : RIGHT", (50, 100), font, 1, (0, 0, 255), 3)
+                    cv2.putText(frame, "STATE : RIGHT", (50, 100), FONT, 1, (0, 0, 255), 3)
                     if RIGHT_COUNTER>EYE_DIRECTION_FRAME:
                         RIGHT_COUNTER =0
                         LEFT_COUNTER =0
@@ -254,7 +248,7 @@ if __name__ == "__main__":
                         # last_order= "RIGHT"
                 elif gaze_ratio == 1 and not blink.is_blinking():
                     CENTER_COUNTER +=1
-                    cv2.putText(frame, "STATE : CENTER", (50, 100), font, 1, (0, 0, 255), 3)
+                    cv2.putText(frame, "STATE : CENTER", (50, 100), FONT, 1, (0, 0, 255), 3)
                     if CENTER_COUNTER>EYE_DIRECTION_FRAME:
                         RIGHT_COUNTER =0
                         LEFT_COUNTER =0
