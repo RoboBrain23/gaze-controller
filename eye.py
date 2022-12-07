@@ -112,7 +112,7 @@ class Blink:
 class Gaze:
     def __init__(self,eye_region,mask,gray):
         self.eye_region = eye_region
-        self.__threshold = 45
+        self.__threshold = 42
         self.mask = mask
         self.gray = gray
 
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     BLINKS_COUNTER =0
     # last_order="IDLE"
     # constants
-    CLOSED_EYES_FRAME =15
+    CLOSED_EYES_FRAME =12
 
     cap = cv2.VideoCapture(1)
     detector = dlib.get_frontal_face_detector()
@@ -197,14 +197,22 @@ if __name__ == "__main__":
             right_eye_ratio = right_eye.blink_ratio()
             blinking_ratio = (left_eye_ratio + right_eye_ratio) / 2
             blink = Blink(blinking_ratio)
+            blink.set_blinking_threshold(5.5)
             if blink.is_blinking():
-                BLINKS_COUNTER +=1
+                is_closed = True
                 cv2.putText(frame, "BLINKING", (50, 150), font,3,(255,0,0))
-                
             else:
-                if BLINKS_COUNTER>CLOSED_EYES_FRAME:
-                    TOTAL_BLINKS +=1
-                    BLINKS_COUNTER =0
+                is_closed = False
+
+            if is_closed:
+                BLINKS_COUNTER +=1
+            else:
+                BLINKS_COUNTER =0
+
+            if BLINKS_COUNTER == CLOSED_EYES_FRAME:
+                TOTAL_BLINKS +=1
+                BLINKS_COUNTER = 0
+
             cv2.putText(frame,  f'Total Blinks: {TOTAL_BLINKS}',(50, 350), font, 2, (0, 0, 255), 3)
 
             gaze_right = Gaze(right_eye.get_eye_region(),mask,gray)
