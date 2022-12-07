@@ -174,7 +174,7 @@ if __name__ == "__main__":
 
     # last_order="IDLE"
     # constants
-    CLOSED_EYES_FRAME =12
+    CLOSED_EYES_FRAME =10
     EYE_DIRECTION_FRAME =20
 
     cap = cv2.VideoCapture(1)
@@ -202,7 +202,7 @@ if __name__ == "__main__":
             right_eye_ratio = right_eye.blink_ratio()
             blinking_ratio = (left_eye_ratio + right_eye_ratio) / 2
             blink = Blink(blinking_ratio)
-            blink.set_blinking_threshold(5.5)
+            blink.set_blinking_threshold(5.3)
             if blink.is_blinking():
                 is_closed = True
                 cv2.putText(frame, "BLINKING", (50, 150), font,3,(255,0,0))
@@ -252,7 +252,7 @@ if __name__ == "__main__":
                         CENTER_COUNTER =0
                         print('right')
                         # last_order= "RIGHT"
-                elif gaze_ratio == 1:
+                elif gaze_ratio == 1 and not blink.is_blinking():
                     CENTER_COUNTER +=1
                     cv2.putText(frame, "STATE : CENTER", (50, 100), font, 1, (0, 0, 255), 3)
                     if CENTER_COUNTER>EYE_DIRECTION_FRAME:
@@ -260,7 +260,7 @@ if __name__ == "__main__":
                         LEFT_COUNTER =0
                         CENTER_COUNTER =0
                         print('forward')
-            if TOTAL_BLINKS== 4:
+            if TOTAL_BLINKS> 3:
                 TOTAL_BLINKS=0
 
         cv2.imshow('frame',frame)
