@@ -48,12 +48,6 @@ class Eye:
         
         return eye_region
 
-    def __analysis(self,frame):
-        self.__detector = dlib.get_frontal_face_detector()
-        self.__predictor = dlib.shape_predictor(self.MODEL)
-        faces = self.__detector(self.__frame)
-        height,width,_ = frame.shape
-        self.mask = np.zeros((height,width),dtype=np.uint8)
 
     def blink_ratio(self):
         """Returns blinking ratio
@@ -119,13 +113,13 @@ class Gaze:
     def get_gaze_ratio(self):
         eye_threshold = self.get_eye_threshold(self.eye_region)
         height,width = eye_threshold.shape
-        left_side_eye_threshold = eye_threshold[0:height,0:int(width/4)]
+        left_side_eye_threshold = eye_threshold[0:height,0:int(width/3)]
         left_side_eye_threshold_white = cv2.countNonZero(left_side_eye_threshold)
 
-        center_side_eye_threshold = eye_threshold[0:height,int(width/4):int(3*width/4)]
+        center_side_eye_threshold = eye_threshold[0:height,int(width/3):int(2*width/3)]
         center_side_eye_threshold_white = cv2.countNonZero(center_side_eye_threshold)
 
-        right_side_eye_threshold = eye_threshold[0:height,int(3*width/4):]
+        right_side_eye_threshold = eye_threshold[0:height,int(2*width/3):]
         right_side_eye_threshold_white = cv2.countNonZero(right_side_eye_threshold)
 
         #left
@@ -171,13 +165,14 @@ if __name__ == "__main__":
     LEFT_COUNTER = 0
     RIGHT_COUNTER = 0
     CENTER_COUNTER = 0
+    flag=0
 
     # last_order="IDLE"
     # constants
-    CLOSED_EYES_FRAME =10
+    CLOSED_EYES_FRAME =22
     EYE_DIRECTION_FRAME =20
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -202,7 +197,7 @@ if __name__ == "__main__":
             right_eye_ratio = right_eye.blink_ratio()
             blinking_ratio = (left_eye_ratio + right_eye_ratio) / 2
             blink = Blink(blinking_ratio)
-            blink.set_blinking_threshold(5.3)
+            blink.set_blinking_threshold(6.2)
             if blink.is_blinking():
                 is_closed = True
                 cv2.putText(frame, "BLINKING", (50, 150), font,3,(255,0,0))
@@ -214,16 +209,21 @@ if __name__ == "__main__":
             else:
                 BLINKS_COUNTER =0
 
-            if BLINKS_COUNTER == CLOSED_EYES_FRAME:
-                TOTAL_BLINKS +=1
+            if BLINKS_COUNTER == CLOSED_EYES_FRAME :
+                flag=1
                 BLINKS_COUNTER = 0
 
+            if flag ==1 and not is_closed:
+                TOTAL_BLINKS +=1 
+                flag=0 
 
 
             cv2.putText(frame,  f'Total Blinks: {TOTAL_BLINKS}',(50, 350), font, 2, (0, 0, 255), 3)
 
             gaze_right = Gaze(right_eye.get_eye_region(),mask,gray)
+            gaze_right.set_threshold(70)
             gaze_left = Gaze(left_eye.get_eye_region(),mask,gray)
+            gaze_left.set_threshold(70)
             gaze_ratio = math.ceil((gaze_right.get_gaze_ratio()+gaze_left.get_gaze_ratio())/2)
             # if gaze_ratio == 2:
             #     cv2.putText(frame, "STATE : RIGHT", (350, 50), font, 1, (0, 0, 255), 3)
