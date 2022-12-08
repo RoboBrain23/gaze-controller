@@ -109,6 +109,9 @@ class Gaze:
         self.gray = gray
 
     def get_gaze_ratio(self):
+        """
+        get gaze ratio
+        """
         eye_threshold = self.get_eye_threshold(self.eye_region)
         height,width = eye_threshold.shape
         left_side_eye_threshold = eye_threshold[0:height,0:int(width/4)]
@@ -132,6 +135,9 @@ class Gaze:
         return gaze_ratio
 
     def get_min_max_eye_region(self):
+        """
+        get furthest point and nearst point postions
+        """
         min_x = np.min(self.eye_region[:,0])
         max_x = np.max(self.eye_region[:,0])
         min_y = np.min(self.eye_region[:,1])
@@ -140,6 +146,12 @@ class Gaze:
 
 
     def get_eye_threshold(self,eye_region):
+        """get eye threshold from eye region
+
+        Arguments:
+            Eye region : eye_region
+        """
+        
         min_x,max_x,min_y,max_y = self.get_min_max_eye_region()
         cv2.polylines(self.mask,[eye_region],True,0,5)
         cv2.fillPoly(self.mask,[eye_region],255)
@@ -151,9 +163,15 @@ class Gaze:
         return eye_threshold
 
     def set_threshold(self,threshold):
+        """set eye threshold
+
+        Arguments:
+            Gaze threshold : threshold
+        """
         self.__threshold = threshold
     
     def get_threshold(self):
+        """get eye threshold"""
         return self.__threshold
 
 if __name__ == "__main__":
