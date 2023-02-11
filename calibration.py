@@ -1,8 +1,12 @@
 from eye import Eye
 import cv2
+import numpy as np
 
 
 class Calibration:
+    def __init__(self):
+        self.blink_threshold = 10
+        self.blink_ratios = []
 
     @staticmethod
     def threshold_calibrate(eye_gaze, thresh):
@@ -23,10 +27,16 @@ class Calibration:
         #     right_eye_thresh += 1
         # print(left_eye_thresh,right_eye_thresh)
 
-    @staticmethod
-    def blink_calibrate(blink_ratio):
-        if blink_ratio > 5.7:
-            blink_ratio = 5.7
-        elif blink_ratio < 4.5:
-            blink_ratio = 4.5
-        return blink_ratio
+    def blink_calibrate(self):
+        blinks = np.array(self.blink_ratios)
+        self.blink_threshold = np.mean(blinks)
+
+    def add_blink_ratio(self, blink_ratio):
+        if blink_ratio > 4:
+            self.blink_ratios.append(blink_ratio)
+
+    def get_cal_blink_threshold(self):
+        return self.blink_threshold
+
+    def get_cal_eye_threshold(self):
+        return self.eye_threshold
