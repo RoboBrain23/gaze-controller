@@ -6,6 +6,23 @@ from gaze import Gaze
 from eye import Eye
 from blink import Blink
 from calibration import Calibration
+class utils:
+    def __init__(self):
+        self.total_blinks = 0
+        self.blinks_counter = 0
+        self.left_counter = 0
+        self.right_counter = 0
+        self.center_counter = 0
+        self.flag = 0
+        self.closed_eyes_frame = 10
+        self.eye_direction_frame = 10
+        self.calibration_frame = 200
+        self.is_calibrated = False
+        self.left_eye_thresh = 100
+        self.right_eye_thresh = 100
+        self.blinks = []
+        self.k = True
+
 
 if __name__ == "__main__":
     TOTAL_BLINKS = 0
@@ -23,7 +40,7 @@ if __name__ == "__main__":
 
     left_eye_thresh = 100
     right_eye_thresh = 100
-    blinking_threshold = 5.2
+    # blinking_threshold = 5.2
     blinks = []
     k = True
     calibrate = Calibration()
@@ -56,7 +73,7 @@ if __name__ == "__main__":
 
                     blink.set_blinking_threshold(calibrate.get_cal_blink_threshold())
 
-                    if blink.is_blinking() and is_calibrated:
+                    if blink.is_blinking() and calibrate.is_calibrated:
                         is_closed = True
                         cv2.putText(frame, "BLINKING", (50, 150), FONT, 3, (255, 0, 0))
                     else:
@@ -78,37 +95,17 @@ if __name__ == "__main__":
                     cv2.putText(frame, f'Total Blinks: {TOTAL_BLINKS}', (50, 350), FONT, 2, (0, 0, 255), 3)
 
                     gaze_right = Gaze(right_eye.get_eye_region(), mask, gray)
-                    gaze_right.set_threshold(right_eye_thresh)  # change right eye threshold
+                    gaze_right.set_threshold(calibrate.get_cal_right_eye_thresh())  # change right eye threshold
                     gaze_left = Gaze(left_eye.get_eye_region(), mask, gray)
-                    gaze_left.set_threshold(left_eye_thresh)  # change left eye threshold
+                    gaze_left.set_threshold(calibrate.get_cal_left_eye_thresh())  # change left eye threshold
                     # print(gaze_left.get_threshold())
 
                     # Calibrate
-                    if CALIBRATION_FRAME > 100:
-
-                        left_eye_thresh = calibrate.threshold_calibrate(gaze_left, left_eye_thresh)
-                        right_eye_thresh = calibrate.threshold_calibrate(gaze_right, right_eye_thresh)
-                        CALIBRATION_FRAME -= 1
-                        cv2.putText(frame, "CALIBRATING THRESHOLD", (50, 100), FONT, 2, (255, 0, 0))
-                        print(f'Left eye threshold: {left_eye_thresh}')
-                        print(f'Right eye threshold: {right_eye_thresh}')
-                    elif 100 >= CALIBRATION_FRAME > 0:
-                        #todo: calibrate blinking threshold
-                        CALIBRATION_FRAME -= 1
-                        cv2.putText(frame, "CALIBRATING BLINK", (50, 100), FONT, 2, (255, 0, 0))
-                        # blinking_threshold = calibrate.blink_calibrate(blinking_ratio)
-                        # blinking_threshold = round(math.ceil(min(blinking_ratio, blinking_threshold)* 100) / 100, 2)
-                        calibrate.add_blink_ratio(blinking_ratio)
-                        print(f'Blink ratio: {blinking_ratio}')
-                    elif CALIBRATION_FRAME == 0:
-                        calibrate.blink_calibrate()
-                        is_calibrated = True
-                        # print('Calibration done')
-                    if is_calibrated and k:
-                        # blinks = np.array(blinks)
-                        # blinking_threshold = np.mean(blinks)
-                        print(f'Blinking threshold: {blinking_threshold}')
-                        k = False
+                    calibrate.calibrate(gaze_left, gaze_right, blinking_ratio)
+                    if calibrate.is_cal_threshold:
+                        cv2.putText(frame, "Calibrating Threshold", (150, 50), FONT, 1, (200, 0, 200), 2)
+                    elif calibrate.is_cal_blink:
+                        cv2.putText(frame, "Calibrating Blinking", (150, 50), FONT, 1, (200, 0, 200), 2)
 
                     gaze_ratio = math.ceil((gaze_right.get_gaze_ratio() + gaze_left.get_gaze_ratio()) / 2)
                     if TOTAL_BLINKS == 2 or TOTAL_BLINKS == 3:
