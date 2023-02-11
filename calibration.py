@@ -1,4 +1,3 @@
-from eye import Eye
 import cv2
 import numpy as np
 
@@ -7,6 +6,9 @@ class Calibration:
     """Calibration class for calibrating eye threshold and blink threshold"""
 
     def __init__(self):
+        """
+        Initialize Calibration object
+        """
         self.blink_threshold = 10
         self.blink_ratios = []
 

@@ -8,12 +8,22 @@ class Gaze:
     """
 
     def __init__(self, eye_region, mask, gray):
+        """
+        Initialize Gaze object
+        :param eye_region: eye region
+        :param mask: mask of eye region
+        :param gray: gray image
+        """
         self.eye_region = eye_region
         self.__threshold = 42
         self.mask = mask
         self.gray = gray
 
     def get_gaze_ratio(self):
+        """
+        Get gaze ratio
+        :return: gaze ratio value (0 for left, 2 for right, 1 for up(Forward))
+        """
         eye_threshold = self.get_eye_threshold(self.eye_region)
         height, width = eye_threshold.shape
 
@@ -72,7 +82,8 @@ class Gaze:
 
     def get_min_max_eye_region(self):
         """
-        get furthest point and nearst point postions
+        get furthest point and nearst point positions
+        :return: min_x, max_x, min_y, max_y (furthest point and nearst point positions)
         """
         min_x = np.min(self.eye_region[:, 0])
         max_x = np.max(self.eye_region[:, 0])
@@ -81,10 +92,10 @@ class Gaze:
         return min_x, max_x, min_y, max_y
 
     def get_eye_threshold(self, eye_region):
-        """get eye threshold from eye region
-
-        Arguments:
-            Eye region : eye_region
+        """
+        get eye threshold from eye region
+        :param eye_region: eye region
+        :return: eye threshold
         """
 
         min_x, max_x, min_y, max_y = self.get_min_max_eye_region()
@@ -98,13 +109,16 @@ class Gaze:
         return eye_threshold
 
     def set_threshold(self, threshold):
-        """set eye threshold
-
-        Arguments:
-            Gaze threshold : threshold
+        """
+        set eye threshold
+        :param threshold: threshold value
+        :return: None
         """
         self.__threshold = threshold
 
     def get_threshold(self):
-        """get eye threshold"""
+        """
+        get eye threshold
+        :return: threshold value
+        """
         return self.__threshold
