@@ -44,6 +44,7 @@ class Eye:
 
         return eye_region
 
+    #todo: Fix division by zero error
     def blink_ratio(self):
         """Returns blinking ratio"""
         horizontal_distance = self.get_eye_width()
@@ -59,6 +60,16 @@ class Eye:
         horizontal_distance = math.hypot(left_point[0] - right_point[0],
                                          left_point[1] - right_point[1])
         return horizontal_distance
+
+    def get_blink_ratio(self):
+        """Returns blinking ratio based on EAR"""
+        eye_region = self.get_eye_region()
+        A = np.linalg.norm(eye_region[1] - eye_region[5])
+        B = np.linalg.norm(eye_region[2] - eye_region[4])
+        C = np.linalg.norm(eye_region[0] - eye_region[3])
+        ear = (A + B) / (2.0 * C)
+        return ear
+
 
     def get_eye_height(self):
         """Returns Height of Eye"""

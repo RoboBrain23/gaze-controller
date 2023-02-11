@@ -21,5 +21,10 @@ class Blink:
             return True
         return False
 
+    def is_blinking_v2(self):
+        """Check if the eye is blinking on Ear"""
+        if self.blink_ratio < self.__threshold:
+            return True
+        return False
     def get_blinking_threshold(self):
         return self.__threshold
