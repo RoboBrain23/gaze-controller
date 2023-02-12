@@ -6,8 +6,10 @@ from gaze import Gaze
 from eye import Eye
 from blink import Blink
 from calibration import Calibration
-class utils:
-    def __init__(self):
+
+
+class Movement:
+    def __init__(self, gaze_ratio):
         self.total_blinks = 0
         self.blinks_counter = 0
         self.left_counter = 0
@@ -16,12 +18,12 @@ class utils:
         self.flag = 0
         self.closed_eyes_frame = 10
         self.eye_direction_frame = 10
-        self.calibration_frame = 200
-        self.is_calibrated = False
         self.left_eye_thresh = 100
         self.right_eye_thresh = 100
-        self.blinks = []
-        self.k = True
+        self.is_right = False
+        self.is_left = False
+        self.is_center = False
+        self.gaze_ratio = gaze_ratio
 
 
 if __name__ == "__main__":
@@ -33,8 +35,6 @@ if __name__ == "__main__":
     FLAG = 0
     CLOSED_EYES_FRAME = 10
     EYE_DIRECTION_FRAME = 10
-    CALIBRATION_FRAME = 200
-    is_calibrated = False
     MODEL = "shape_predictor_68_face_landmarks.dat"
     FONT = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -98,7 +98,6 @@ if __name__ == "__main__":
                     gaze_right.set_threshold(calibrate.get_cal_right_eye_thresh())  # change right eye threshold
                     gaze_left = Gaze(left_eye.get_eye_region(), mask, gray)
                     gaze_left.set_threshold(calibrate.get_cal_left_eye_thresh())  # change left eye threshold
-                    # print(gaze_left.get_threshold())
 
                     # Calibrate
                     calibrate.calibrate(gaze_left, gaze_right, blinking_ratio)
@@ -108,6 +107,7 @@ if __name__ == "__main__":
                         cv2.putText(frame, "Calibrating Blinking", (150, 50), FONT, 1, (200, 0, 200), 2)
 
                     gaze_ratio = math.ceil((gaze_right.get_gaze_ratio() + gaze_left.get_gaze_ratio()) / 2)
+
                     if TOTAL_BLINKS == 2 or TOTAL_BLINKS == 3:
                         if gaze_ratio == 0 and not blink.is_blinking():
                             LEFT_COUNTER += 1
