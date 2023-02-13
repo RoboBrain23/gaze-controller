@@ -8,18 +8,14 @@ from blink import Blink
 from calibration import Calibration
 
 
+# Todo Separate Movement class from main.py
 class Movement:
     def __init__(self):
         self.total_blinks = 0
-        self.blinks_counter = 0
         self.left_counter = 0
         self.right_counter = 0
         self.center_counter = 0
-        self.flag = 0
-        self.closed_eyes_frame = 10
         self.eye_direction_frame = 10
-        self.left_eye_thresh = 100
-        self.right_eye_thresh = 100
         self.is_right = False
         self.is_left = False
         self.is_center = False
@@ -93,6 +89,11 @@ class Movement:
         self.total_blinks = total_blinks % 4
 
 
+# Todo Make constants.py file and move all constants there and import them here and in other files as well
+# Todo Add comments to all functions and classes
+# Todo Add docstrings to all functions and classes and generate documentation using sphinx
+# Todo Make Unit tests for all functions and classes
+# Todo Improve code readability and quality
 if __name__ == "__main__":
     TOTAL_BLINKS = 0
     BLINKS_COUNTER = 0
@@ -112,6 +113,7 @@ if __name__ == "__main__":
     k = True
     calibrate = Calibration()
     movement = Movement()
+    blink = Blink()
     try:
         cap = cv2.VideoCapture(0)
         detector = dlib.get_frontal_face_detector()
@@ -137,30 +139,15 @@ if __name__ == "__main__":
                     left_eye_ratio = left_eye.blink_ratio()
                     right_eye_ratio = right_eye.blink_ratio()
                     blinking_ratio = (left_eye_ratio + right_eye_ratio) / 2
-                    blink = Blink(blinking_ratio)
-
+                    blink.set_blink_ratio(blinking_ratio)
                     blink.set_blinking_threshold(calibrate.get_cal_blink_threshold())
 
-                    if blink.is_blinking() and calibrate.is_calibrated:
-                        is_closed = True
-                        cv2.putText(frame, "BLINKING", (50, 150), FONT, 3, (255, 0, 0))
-                    else:
-                        is_closed = False
+                    if calibrate.is_calibrated:
+                        TOTAL_BLINKS = blink.count_blinks()
+                        if blink.is_blinking():
+                            cv2.putText(frame, "BLINKING", (50, 150), FONT, 3, (255, 0, 0))
 
-                    if is_closed:
-                        BLINKS_COUNTER += 1
-                    else:
-                        BLINKS_COUNTER = 0
-
-                    if BLINKS_COUNTER == CLOSED_EYES_FRAME:
-                        FLAG = 1
-                        BLINKS_COUNTER = 0
-
-                    if FLAG == 1 and not is_closed:
-                        TOTAL_BLINKS += 1
-                        FLAG = 0
-
-                    cv2.putText(frame, f'Total Blinks: {TOTAL_BLINKS}', (50, 350), FONT, 2, (0, 0, 255), 3)
+                        cv2.putText(frame, f'Total Blinks: {TOTAL_BLINKS}', (50, 350), FONT, 2, (0, 0, 255), 3)
 
                     gaze_right = Gaze(right_eye.get_eye_region(), mask, gray)
                     gaze_right.set_threshold(calibrate.get_cal_right_eye_thresh())  # change right eye threshold
