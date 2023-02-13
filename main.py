@@ -9,7 +9,7 @@ from calibration import Calibration
 
 
 class Movement:
-    def __init__(self, gaze_ratio):
+    def __init__(self):
         self.total_blinks = 0
         self.blinks_counter = 0
         self.left_counter = 0
@@ -23,13 +23,13 @@ class Movement:
         self.is_right = False
         self.is_left = False
         self.is_center = False
-        self.gaze_ratio = gaze_ratio
+        self.gaze_ratio = 4
         self.is_running = False
 
     def run(self):
         if 2 <= self.total_blinks <= 3:
             self.is_running = True
-        elif self.total_blinks>3:
+        elif self.total_blinks > 3:
             self.total_blinks = 0
             self.is_running = False
         else:
@@ -56,16 +56,16 @@ class Movement:
         # if self.gaze_ratio == 1:
         self.is_center = True
         self.center_counter += 1
-        # cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
+        cv2.putText(frame, "STATE : FORWARD", (50, 100), FONT, 1, (0, 0, 255), 3)
         if self.center_counter > self.eye_direction_frame:
             self.stop()
-            print('Left')
+            print('Forward')
 
     def move_left(self):
         # if self.gaze_ratio == 0:
         self.is_center = True
         self.left_counter += 1
-        # cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
+        cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
         if self.left_counter > self.eye_direction_frame:
             self.stop()
             print('Left')
@@ -74,16 +74,24 @@ class Movement:
         # if self.gaze_ratio == 2:
         self.is_center = True
         self.right_counter += 1
-        # cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
+        cv2.putText(frame, "STATE : RIGHT", (50, 100), FONT, 1, (0, 0, 255), 3)
         if self.right_counter > self.eye_direction_frame:
             self.stop()
-            print('Left')
+            print('Right')
 
     def stop(self):
+        cv2.putText(frame, "STATE : STOP", (50, 100), FONT, 1, (0, 0, 255), 3)
         self.is_center = False
         self.is_left = False
         self.is_right = False
         self.move_counter_reset()
+
+    def set_gaze_ratio(self, gaze_ratio):
+        self.gaze_ratio = gaze_ratio
+
+    def set_total_blinks(self, total_blinks):
+        self.total_blinks = total_blinks % 4
+
 
 if __name__ == "__main__":
     TOTAL_BLINKS = 0
@@ -103,6 +111,7 @@ if __name__ == "__main__":
     blinks = []
     k = True
     calibrate = Calibration()
+    movement = Movement()
     try:
         cap = cv2.VideoCapture(0)
         detector = dlib.get_frontal_face_detector()
@@ -166,42 +175,9 @@ if __name__ == "__main__":
                         cv2.putText(frame, "Calibrating Blinking", (150, 50), FONT, 1, (200, 0, 200), 2)
 
                     gaze_ratio = math.ceil((gaze_right.get_gaze_ratio() + gaze_left.get_gaze_ratio()) / 2)
-
-                    if TOTAL_BLINKS == 2 or TOTAL_BLINKS == 3:
-                        if gaze_ratio == 0 and not blink.is_blinking():
-                            LEFT_COUNTER += 1
-                            cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
-                            if LEFT_COUNTER > EYE_DIRECTION_FRAME:  # frame=20
-                                RIGHT_COUNTER = 0
-                                LEFT_COUNTER = 0
-                                CENTER_COUNTER = 0
-                                print('Left')
-                        elif gaze_ratio == 2 and not blink.is_blinking():
-                            RIGHT_COUNTER += 1
-                            cv2.putText(frame, "STATE : RIGHT", (50, 100), FONT, 1, (0, 0, 255), 3)
-                            if RIGHT_COUNTER > EYE_DIRECTION_FRAME:
-                                RIGHT_COUNTER = 0
-                                LEFT_COUNTER = 0
-                                CENTER_COUNTER = 0
-                                print('right')
-                        elif gaze_ratio == 1 and not blink.is_blinking():
-                            CENTER_COUNTER += 1
-                            cv2.putText(frame, "STATE : CENTER", (50, 100), FONT, 1, (0, 0, 255), 3)
-                            if CENTER_COUNTER > EYE_DIRECTION_FRAME:
-                                RIGHT_COUNTER = 0
-                                LEFT_COUNTER = 0
-                                CENTER_COUNTER = 0
-                                print('forward')
-                        else:
-                            cv2.putText(frame, "STATE : STOP", (50, 100), FONT, 1, (0, 0, 255), 3)
-                            RIGHT_COUNTER = 0
-                            LEFT_COUNTER = 0
-                            CENTER_COUNTER = 0
-                            # print('stop')
-
-                    if TOTAL_BLINKS > 3:
-                        TOTAL_BLINKS = 0
-
+                    movement.set_total_blinks(TOTAL_BLINKS)
+                    movement.set_gaze_ratio(gaze_ratio)
+                    movement.driver()
                 cv2.imshow('frame', frame)
                 # cv2.imshow('mask',mask)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
