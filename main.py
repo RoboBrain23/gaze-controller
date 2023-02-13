@@ -24,7 +24,66 @@ class Movement:
         self.is_left = False
         self.is_center = False
         self.gaze_ratio = gaze_ratio
+        self.is_running = False
 
+    def run(self):
+        if 2 <= self.total_blinks <= 3:
+            self.is_running = True
+        elif self.total_blinks>3:
+            self.total_blinks = 0
+            self.is_running = False
+        else:
+            self.is_running = False
+
+    def driver(self):
+        self.run()
+        if self.is_running:
+            if self.gaze_ratio == 1:
+                self.move_center()
+            elif self.gaze_ratio == 0:
+                self.move_left()
+            elif self.gaze_ratio == 2:
+                self.move_right()
+            else:
+                self.stop()
+
+    def move_counter_reset(self):
+        self.right_counter = 0
+        self.left_counter = 0
+        self.center_counter = 0
+
+    def move_center(self):
+        # if self.gaze_ratio == 1:
+        self.is_center = True
+        self.center_counter += 1
+        # cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
+        if self.center_counter > self.eye_direction_frame:
+            self.stop()
+            print('Left')
+
+    def move_left(self):
+        # if self.gaze_ratio == 0:
+        self.is_center = True
+        self.left_counter += 1
+        # cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
+        if self.left_counter > self.eye_direction_frame:
+            self.stop()
+            print('Left')
+
+    def move_right(self):
+        # if self.gaze_ratio == 2:
+        self.is_center = True
+        self.right_counter += 1
+        # cv2.putText(frame, "STATE : LEFT", (50, 100), FONT, 1, (0, 0, 255), 3)
+        if self.right_counter > self.eye_direction_frame:
+            self.stop()
+            print('Left')
+
+    def stop(self):
+        self.is_center = False
+        self.is_left = False
+        self.is_right = False
+        self.move_counter_reset()
 
 if __name__ == "__main__":
     TOTAL_BLINKS = 0
