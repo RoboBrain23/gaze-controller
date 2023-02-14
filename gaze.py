@@ -14,17 +14,18 @@ class Gaze:
         :param mask: mask of eye region
         :param gray: gray image
         """
-        self.eye_region = eye_region
+        self.__eye_region = eye_region
         self.__threshold = 42
-        self.mask = mask
-        self.gray = gray
+        self.__mask = mask
+        self.__gray = gray
 
     def get_gaze_ratio(self):
+        # Todo: Improve direction detection by setting good range for each direction
         """
-        Get gaze ratio
+        Get gaze ratio by comparing number of white pixels in each part of eye region (left, right, up, center).
         :return: gaze ratio value (0 for left, 2 for right, 1 for up(Forward))
         """
-        eye_threshold = self.get_eye_threshold(self.eye_region)
+        eye_threshold = self.get_eye_threshold(self.__eye_region)
         height, width = eye_threshold.shape
 
         up_side_eye_threshold = eye_threshold[0:int(height / 4), 0:width]
@@ -85,10 +86,10 @@ class Gaze:
         get furthest point and nearst point positions
         :return: min_x, max_x, min_y, max_y (furthest point and nearst point positions)
         """
-        min_x = np.min(self.eye_region[:, 0])
-        max_x = np.max(self.eye_region[:, 0])
-        min_y = np.min(self.eye_region[:, 1])
-        max_y = np.max(self.eye_region[:, 1])
+        min_x = np.min(self.__eye_region[:, 0])
+        max_x = np.max(self.__eye_region[:, 0])
+        min_y = np.min(self.__eye_region[:, 1])
+        max_y = np.max(self.__eye_region[:, 1])
         return min_x, max_x, min_y, max_y
 
     def get_eye_threshold(self, eye_region):
@@ -99,9 +100,9 @@ class Gaze:
         """
 
         min_x, max_x, min_y, max_y = self.get_min_max_eye_region()
-        cv2.polylines(self.mask, [eye_region], True, 0, 5)
-        cv2.fillPoly(self.mask, [eye_region], 255)
-        gray_eye = cv2.bitwise_and(self.gray, self.gray, mask=self.mask)
+        cv2.polylines(self.__mask, [eye_region], True, 0, 5)
+        cv2.fillPoly(self.__mask, [eye_region], 255)
+        gray_eye = cv2.bitwise_and(self.__gray, self.__gray, mask=self.__mask)
         eye = gray_eye[min_y:max_y, min_x:max_x]
         eye = cv2.resize(eye, None, fx=5, fy=5)
         _, eye_threshold = cv2.threshold(eye, self.__threshold, 255, cv2.THRESH_BINARY)
@@ -122,3 +123,10 @@ class Gaze:
         :return: threshold value
         """
         return self.__threshold
+
+    def get_eye_region(self):
+        """
+        get eye region
+        :return: eye region
+        """
+        return self.__eye_region
