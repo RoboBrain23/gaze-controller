@@ -145,3 +145,11 @@ class Movement:
         :return: None
         """
         self.__total_blinks = total_blinks % 4
+
+    def set_eye_direction_frame(self, eye_direction_frame):
+        """
+        Set eye direction frame to a certain value
+        :param eye_direction_frame: eye direction frame value
+        :return: None
+        """
+        self.__eye_direction_frame = eye_direction_frame
