@@ -24,15 +24,17 @@ class Calibration:
     def threshold_calibrate(eye_gaze, thresh):
         """
         Calibrate eye threshold by comparing number of white pixels in eye region.
-        if number of white pixels is less than 1400, decrease threshold by 1
-        if number of white pixels is greater than 3000, increase threshold by 1
+        if percentage of white pixels is less than 24, decrease threshold by 1
+        if percentage of white pixels is greater than 54, increase threshold by 1
         :param eye_gaze: Eye object
         :param thresh: current threshold
         :return: thresh the updated threshold
         """
-        if cv2.countNonZero(eye_gaze.get_eye_threshold(eye_gaze.get_eye_region())) < 1400 and thresh > 0:
+        eye_threshold = eye_gaze.get_eye_threshold(eye_gaze.get_eye_region())
+        nonzero_percentage = cv2.countNonZero(eye_threshold) / (eye_threshold.shape[0] * eye_threshold.shape[1]) * 100
+        if nonzero_percentage < 24 and thresh > 0:
             thresh -= 1
-        elif cv2.countNonZero(eye_gaze.get_eye_threshold(eye_gaze.get_eye_region())) > 3000 and thresh < 255:
+        elif nonzero_percentage > 54 and thresh < 255:
             thresh += 1
         return thresh
 
