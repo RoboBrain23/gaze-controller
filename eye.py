@@ -29,7 +29,7 @@ class Eye:
     @staticmethod
     def mid_point(p1, p2):
         """
-        Get the middle point (x,y) between two points
+        Get the middle point (x,y) between two points.
         :param p1: point 1
         :param p2: point 2
         :return: middle point (x,y)
@@ -39,7 +39,7 @@ class Eye:
 
     def get_eye_region(self):
         """
-        Get Eye region from points
+        Get Eye region from points of the eye region and return it as numpy array of points (x,y).
         :return: eye region (numpy array) of points
         """
         points = self.__eye
@@ -52,10 +52,9 @@ class Eye:
 
         return eye_region
 
-    # todo: Fix division by zero error
     def blink_ratio(self):
         """
-        Get blinking ratio
+        Get blinking ratio by dividing the horizontal distance by the vertical distance of the eye region.
         :return: blink ratio
         """
         horizontal_distance = self.get_eye_width()
@@ -80,7 +79,9 @@ class Eye:
 
     def get_blink_ratio(self):
         """
-        Get blinking ratio based on EAR
+        Get blinking ratio based on EAR (Eye Aspect Ratio).
+        by taking the euclidean distance between the vertical eye landmarks
+        and dividing it by the euclidean distance between the horizontal eye landmarks.
         :return: blink ratio
         """
         eye_region = self.get_eye_region()
