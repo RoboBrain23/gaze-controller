@@ -41,16 +41,20 @@ class Calibration:
         Calibrate blink threshold by calculating mean of blink ratios that are greater than 4.
         :return: None
         """
-        blinks = np.array(self.__blink_ratios)
-        self.__blink_threshold = np.mean(blinks)
+        if len(self.__blink_ratios) > 0:
+            blinks = np.array(self.__blink_ratios)
+            self.__blink_threshold = np.mean(blinks)
+        else:
+            self.__blink_threshold = 2.7
 
-    def add_blink_ratio(self, blink_ratio):
+    def add_blink_ratio(self, blink_ratio, blink_threshold=3):
         """
-        Add blink ratio to list of blink ratios if blink ratio is greater than 4
+        Add blink ratio to list of blink ratios if blink ratio is greater than blink_threshold (default 3)
+        :param blink_threshold: blink threshold to compare with blink ratio
         :param blink_ratio: blink ratio
         :return: None
         """
-        if blink_ratio > 4:
+        if blink_ratio > blink_threshold:
             self.__blink_ratios.append(blink_ratio)
 
     def get_cal_blink_threshold(self):
