@@ -17,6 +17,7 @@ if __name__ == "__main__":
     # Constants
     CLOSED_EYES_FRAME = 10
     EYE_DIRECTION_FRAME = 10
+    CALIBRATION_FRAMES = 200
     MODEL = "shape_predictor_68_face_landmarks.dat"
     FONT = cv2.FONT_HERSHEY_SIMPLEX
     # Variables
@@ -26,6 +27,10 @@ if __name__ == "__main__":
     calibrate = Calibration()
     movement = Movement()
     blink = Blink()
+    # Set frames
+    calibrate.set_cal_frames(CALIBRATION_FRAMES)
+    movement.set_eye_direction_frame(EYE_DIRECTION_FRAME)
+    blink.set_closed_eye_frame(CLOSED_EYES_FRAME)
     # Main
     try:
         cap = cv2.VideoCapture(0)  # initialize camera
