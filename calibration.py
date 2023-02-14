@@ -9,68 +9,63 @@ class Calibration:
         """
         Initialize Calibration object
         """
-        self.blink_threshold = 10
-        self.blink_ratios = []
-        self.calibration_frames = calibration_frames
-        self.is_calibrated = False
-        self.done = False
-        self.left_eye_thresh = 42
-        self.right_eye_thresh = 42
-        self.is_cal_threshold = False
-        self.is_cal_blink = False
-        self.calibration_frames_count = 0
+        self.__blink_threshold = 10
+        self.__blink_ratios = []
+        self.__calibration_frames = calibration_frames
+        self.__is_calibrated = False
+        self.__done = False
+        self.__left_eye_thresh = 42
+        self.__right_eye_thresh = 42
+        self.__is_cal_threshold = False
+        self.__is_cal_blink = False
+        self.__calibration_frames_count = 0
 
     @staticmethod
     def threshold_calibrate(eye_gaze, thresh):
         """
-        Calibrate eye threshold
+        Calibrate eye threshold by comparing number of white pixels in eye region.
+        if number of white pixels is less than 1400, decrease threshold by 1
+        if number of white pixels is greater than 3000, increase threshold by 1
         :param eye_gaze: Eye object
         :param thresh: current threshold
         :return: thresh the updated threshold
         """
-        if cv2.countNonZero(eye_gaze.get_eye_threshold(eye_gaze.eye_region)) < 1400 and thresh > 0:
+        if cv2.countNonZero(eye_gaze.get_eye_threshold(eye_gaze.get_eye_region())) < 1400 and thresh > 0:
             thresh -= 1
-        elif cv2.countNonZero(eye_gaze.get_eye_threshold(eye_gaze.eye_region)) > 3000 and thresh < 255:
+        elif cv2.countNonZero(eye_gaze.get_eye_threshold(eye_gaze.get_eye_region())) > 3000 and thresh < 255:
             thresh += 1
         return thresh
 
     def blink_calibrate(self):
         """
-        Calibrate blink threshold
+        Calibrate blink threshold by calculating mean of blink ratios that are greater than 4.
         :return: None
         """
-        blinks = np.array(self.blink_ratios)
-        self.blink_threshold = np.mean(blinks)
+        blinks = np.array(self.__blink_ratios)
+        self.__blink_threshold = np.mean(blinks)
 
     def add_blink_ratio(self, blink_ratio):
         """
-        Add blink ratio to list
+        Add blink ratio to list of blink ratios if blink ratio is greater than 4
         :param blink_ratio: blink ratio
         :return: None
         """
         if blink_ratio > 4:
-            self.blink_ratios.append(blink_ratio)
+            self.__blink_ratios.append(blink_ratio)
 
     def get_cal_blink_threshold(self):
         """
-        Get calibrated blink threshold
+        Get calibrated blink threshold value
         :return: blink threshold
         """
-        return self.blink_threshold
-
-    def get_cal_eye_threshold(self):
-        """
-        Get calibrated eye threshold
-        :return: eye threshold
-        """
-        return self.eye_threshold
+        return self.__blink_threshold
 
     def get_cal_frames(self):
         """
         Get calibration frames
         :return: calibration frames
         """
-        return self.calibration_frames
+        return self.__calibration_frames
 
     def set_cal_frames(self, frames):
         """
@@ -78,7 +73,7 @@ class Calibration:
         :param frames: calibration frames
         :return: None
         """
-        self.calibration_frames = frames
+        self.__calibration_frames = frames
 
     def calibrate(self, gaze_left, gaze_right, blinking_ratio):
         """
@@ -88,29 +83,29 @@ class Calibration:
         :param blinking_ratio:  blink ratio value
         :return: None
         """
-        if self.calibration_frames_count < self.calibration_frames // 2:
-            self.is_cal_blink = False
-            self.is_cal_threshold = True
-            self.left_eye_thresh = self.threshold_calibrate(gaze_left, self.left_eye_thresh)
-            self.right_eye_thresh = self.threshold_calibrate(gaze_right, self.right_eye_thresh)
-            self.calibration_frames_count += 1
-            print(f'Left eye threshold: {self.left_eye_thresh}')
-            print(f'Right eye threshold: {self.right_eye_thresh}')
-        elif self.calibration_frames > self.calibration_frames_count>=self.calibration_frames // 2:
+        if self.__calibration_frames_count < self.__calibration_frames // 2:
+            self.__is_cal_blink = False
+            self.__is_cal_threshold = True
+            self.__left_eye_thresh = self.threshold_calibrate(gaze_left, self.__left_eye_thresh)
+            self.__right_eye_thresh = self.threshold_calibrate(gaze_right, self.__right_eye_thresh)
+            self.__calibration_frames_count += 1
+            print(f'Left eye threshold: {self.__left_eye_thresh}')
+            print(f'Right eye threshold: {self.__right_eye_thresh}')
+        elif self.__calibration_frames > self.__calibration_frames_count >= self.__calibration_frames // 2:
             # todo: calibrate blinking threshold
-            self.is_cal_blink = True
-            self.is_cal_threshold = False
-            self.calibration_frames_count += 1
+            self.__is_cal_blink = True
+            self.__is_cal_threshold = False
+            self.__calibration_frames_count += 1
             self.add_blink_ratio(blinking_ratio)
             print(f'Blink ratio: {blinking_ratio}')
-        elif self.calibration_frames == self.calibration_frames_count:
-            self.is_cal_blink = False
-            self.is_cal_threshold = False
+        elif self.__calibration_frames == self.__calibration_frames_count:
+            self.__is_cal_blink = False
+            self.__is_cal_threshold = False
             self.blink_calibrate()
-            self.is_calibrated = True
-        if self.is_calibrated and not self.done:
+            self.__is_calibrated = True
+        if self.__is_calibrated and not self.__done:
             print(f'Blinking threshold: {self.get_cal_blink_threshold()}')
-            self.done = True
+            self.__done = True
 
     def set_left_eye_thresh(self, thresh):
         """
@@ -118,7 +113,7 @@ class Calibration:
         :param thresh: threshold of left eye
         :return:  None
         """
-        self.left_eye_thresh = thresh
+        self.__left_eye_thresh = thresh
 
     def set_right_eye_thresh(self, thresh):
         """
@@ -126,18 +121,39 @@ class Calibration:
         :param thresh: threshold of right eye
         :return:  None
         """
-        self.right_eye_thresh = thresh
+        self.__right_eye_thresh = thresh
 
     def get_cal_left_eye_thresh(self):
         """
         Get calibrated left eye threshold
         :return: left eye threshold
         """
-        return self.left_eye_thresh
+        return self.__left_eye_thresh
 
     def get_cal_right_eye_thresh(self):
         """
         Get calibrated right eye threshold
         :return: right eye threshold
         """
-        return self.right_eye_thresh
+        return self.__right_eye_thresh
+
+    def is_calibrated(self):
+        """
+        Check if calibration is done
+        :return: True if calibration is done, False otherwise
+        """
+        return self.__is_calibrated
+
+    def is_cal_blink(self):
+        """
+        Check if calibration is done for blink threshold
+        :return: True if calibration is done, False otherwise
+        """
+        return self.__is_cal_blink
+
+    def is_cal_threshold(self):
+        """
+        Check if calibration is done for eye threshold
+        :return: True if calibration is done, False otherwise
+        """
+        return self.__is_cal_threshold
