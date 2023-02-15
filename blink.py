@@ -1,6 +1,6 @@
 class Blink:
     """
-    This class deals with eye blinking
+    This class is used to check if the eye is blinking or not by calculating the blinking ratio of the eye.
     """
 
     def __init__(self):
@@ -18,7 +18,9 @@ class Blink:
     def set_blinking_threshold(self, blink_threshold):
         """
         set eye blinking threshold
+
         :param blink_threshold: threshold value
+
         :return: None
         """
         self.__threshold = blink_threshold
@@ -26,6 +28,7 @@ class Blink:
     def is_blinking(self):
         """
         Check if the eye is blinking
+
         :return: True if the eye is blinking else False
         """
         if self.__blink_ratio > self.__threshold:
@@ -35,6 +38,7 @@ class Blink:
     def is_blinking_v2(self):
         """
         Check if the eye is blinking on Ear
+
         :return: True if the eye is blinking else False
         """
         if self.__blink_ratio < self.__threshold:
@@ -44,6 +48,7 @@ class Blink:
     def get_blinking_threshold(self):
         """
         get eye blinking threshold
+
         :return: blinking threshold
         """
         return self.__threshold
@@ -51,7 +56,9 @@ class Blink:
     def set_blink_ratio(self, ratio):
         """
         Set blink ratio for eye blinking
+
         :param ratio: blink ratio
+
         :return: None
         """
         self.__blink_ratio = ratio
@@ -59,6 +66,7 @@ class Blink:
     def get_blink_ratio(self):
         """
         Get blink ratio for eye blinking
+
         :return: blink ratio
         """
         return self.__blink_ratio
@@ -66,7 +74,8 @@ class Blink:
     def count_blinks(self):
         """
         Count number of blinks by checking if the eye is closed for a certain number of frames
-        and then open.
+         and then open.
+
         :return: total number of blinks
         """
         if self.is_blinking():
@@ -93,7 +102,9 @@ class Blink:
     def set_closed_eye_frame(self, frame):
         """
         Set closed eye frame
+
         :param frame: closed eye frame
+
         :return: None
         """
         self.__closed_eye_frame = frame

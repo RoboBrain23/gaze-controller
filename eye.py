@@ -14,8 +14,11 @@ class Eye:
     def __init__(self, frame, side, landmarks):
         """
         Initialize Eye object
+
         :param frame: frame to isolate the eye
+
         :param side: eye side (left or right)
+
         :param landmarks: landmarks of the eye
         """
         self.__frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -30,8 +33,11 @@ class Eye:
     def mid_point(p1, p2):
         """
         Get the middle point (x,y) between two points.
+
         :param p1: point 1
+
         :param p2: point 2
+
         :return: middle point (x,y)
         """
 
@@ -40,6 +46,7 @@ class Eye:
     def get_eye_region(self):
         """
         Get Eye region from points of the eye region and return it as numpy array of points (x,y).
+
         :return: eye region (numpy array) of points
         """
         points = self.__eye
@@ -55,6 +62,7 @@ class Eye:
     def blink_ratio(self):
         """
         Get blinking ratio by dividing the horizontal distance by the vertical distance of the eye region.
+
         :return: blink ratio
         """
         horizontal_distance = self.get_eye_width()
@@ -67,7 +75,8 @@ class Eye:
 
     def get_eye_width(self):
         """
-        Get Width of Eye
+        Get Width of Eye by taking the euclidean distance between the horizontal eye landmarks.
+
         :return: width of eye
         """
         points = self.get_eye_region()
@@ -82,6 +91,7 @@ class Eye:
         Get blinking ratio based on EAR (Eye Aspect Ratio).
         by taking the euclidean distance between the vertical eye landmarks
         and dividing it by the euclidean distance between the horizontal eye landmarks.
+
         :return: blink ratio
         """
         eye_region = self.get_eye_region()
@@ -93,7 +103,8 @@ class Eye:
 
     def get_eye_height(self):
         """
-        Get Height of Eye
+        Get Height of Eye by taking the euclidean distance between the vertical eye landmarks.
+
         :return: height of eye
         """
         points = self.get_eye_region()

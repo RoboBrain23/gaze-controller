@@ -4,14 +4,18 @@ import numpy as np
 
 class Gaze:
     """
-    This class deals with eye gazing
+    This class detects the direction of the gaze (left, right, up)
+     by comparing number of white pixels in each part of eye region.
     """
 
     def __init__(self, eye_region, mask, gray):
         """
         Initialize Gaze object
+
         :param eye_region: eye region
+
         :param mask: mask of eye region
+
         :param gray: gray image
         """
         self.__eye_region = eye_region
@@ -23,12 +27,13 @@ class Gaze:
         # Todo: Improve direction detection by setting good range for each direction
         """
         Get gaze ratio by comparing number of white pixels in each part of eye region (left, right, up, center).
+
         :return: gaze ratio value (0 for left, 2 for right, 1 for up(Forward))
         """
         eye_threshold = self.get_eye_threshold(self.__eye_region)
         height, width = eye_threshold.shape
 
-        up_side_eye_threshold = eye_threshold[0:int(height / 4), 0:width]
+        up_side_eye_threshold = eye_threshold[0:int(height / 3), 0:width]
         up_side_eye_threshold_white = cv2.countNonZero(up_side_eye_threshold)
 
         left_side_eye_threshold = eye_threshold[int(height / 3):int(2 * height / 3), 0:int(width / 3)]
@@ -41,7 +46,7 @@ class Gaze:
         right_side_eye_threshold = eye_threshold[int(height / 3):int(2 * height / 3), int(2 * width / 3):]
         right_side_eye_threshold_white = cv2.countNonZero(right_side_eye_threshold)
 
-        down_side_eye_threshold = eye_threshold[int(height / 4):, 0:width]
+        down_side_eye_threshold = eye_threshold[int(height / 3):, 0:width]
         down_side_eye_threshold_white = cv2.countNonZero(down_side_eye_threshold)
 
         # cv2.imshow('left', left_side_eye_threshold)
@@ -84,6 +89,7 @@ class Gaze:
     def get_min_max_eye_region(self):
         """
         get furthest point and nearst point positions
+
         :return: min_x, max_x, min_y, max_y (furthest point and nearst point positions)
         """
         min_x = np.min(self.__eye_region[:, 0])
@@ -95,7 +101,9 @@ class Gaze:
     def get_eye_threshold(self, eye_region):
         """
         get eye threshold from eye region
+
         :param eye_region: eye region
+
         :return: eye threshold
         """
 
@@ -112,7 +120,9 @@ class Gaze:
     def set_threshold(self, threshold):
         """
         set eye threshold
+
         :param threshold: threshold value
+
         :return: None
         """
         self.__threshold = threshold
@@ -120,6 +130,7 @@ class Gaze:
     def get_threshold(self):
         """
         get eye threshold
+
         :return: threshold value
         """
         return self.__threshold
@@ -127,6 +138,7 @@ class Gaze:
     def get_eye_region(self):
         """
         get eye region
+
         :return: eye region
         """
         return self.__eye_region

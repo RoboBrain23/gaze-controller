@@ -1,4 +1,7 @@
 class Movement:
+    """
+    Movement class is used to get the direction of the eye to use it for controlling the movement.
+    """
     def __init__(self):
         """
         Initialize Movement object
@@ -17,6 +20,7 @@ class Movement:
     def run(self):
         """
         Run the driver function if the total blinks are between 2 and 3 and stop if the total blinks are more than 3.
+
         :return: None
         """
         if 2 <= self.__total_blinks <= 3:
@@ -30,6 +34,7 @@ class Movement:
     def driver(self):
         """
         Driver function to control the movement.
+
         :return: None
         """
         self.run()
@@ -46,6 +51,7 @@ class Movement:
     def move_counter_reset(self):
         """
         Reset direction counters to 0 for a certain number of frames and not blinking.
+
         :return: None
         """
         self.__right_counter = 0
@@ -55,6 +61,7 @@ class Movement:
     def move_forward(self):
         """
         Move forward if gaze ratio is 1 for a certain number of frames and not blinking.
+
         :return: None
         """
         # if self.gaze_ratio == 1:
@@ -68,6 +75,7 @@ class Movement:
     def move_left(self):
         """
         Move left if gaze ratio is 0 for a certain number of frames and not blinking.
+
         :return: None
         """
         # if self.gaze_ratio == 0:
@@ -81,6 +89,7 @@ class Movement:
     def move_right(self):
         """
         Move right if gaze ratio is 2 for a certain number of frames and not blinking.
+
         :return: None
         """
         # if self.gaze_ratio == 2:
@@ -94,7 +103,8 @@ class Movement:
     def stop(self):
         """
         Stop if gaze ratio is not 1, 0 or 2 and reset direction counters.
-        :return:
+
+        :return: None
         """
         # cv2.putText(frame, "STATE : STOP", (50, 100), FONT, 1, (0, 0, 255), 3)
         self.__is_forward = False
@@ -113,6 +123,7 @@ class Movement:
     def is_forward(self):
         """
         Return if it is forward or not
+
         :return: is_forward
         """
         return self.__is_forward
@@ -120,6 +131,7 @@ class Movement:
     def is_left(self):
         """
         Return if it is left or not
+
         :return: is_left
         """
         return self.__is_left
@@ -127,6 +139,7 @@ class Movement:
     def is_right(self):
         """
         Return if it is right or not
+
         :return: is_right
         """
         return self.__is_right
@@ -134,6 +147,7 @@ class Movement:
     def is_stopped(self):
         """
         Return if it is stopped or not
+
         :return: is_stopped
         """
         return not self.__is_forward and not self.__is_left and not self.__is_right
@@ -141,7 +155,9 @@ class Movement:
     def set_total_blinks(self, total_blinks):
         """
         Set total blinks to a certain value
+
         :param total_blinks: total blinks value
+
         :return: None
         """
         self.__total_blinks = total_blinks % 4
@@ -149,7 +165,9 @@ class Movement:
     def set_eye_direction_frame(self, eye_direction_frame):
         """
         Set eye direction frame to a certain value
+
         :param eye_direction_frame: eye direction frame value
+        
         :return: None
         """
         self.__eye_direction_frame = eye_direction_frame
