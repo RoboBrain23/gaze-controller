@@ -108,3 +108,5 @@ class Blink:
         :return: None
         """
         self.__closed_eye_frame = frame
+
+

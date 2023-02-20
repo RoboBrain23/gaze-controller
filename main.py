@@ -20,17 +20,21 @@ if __name__ == "__main__":
     CALIBRATION_FRAMES = 200
     MODEL = "shape_predictor_68_face_landmarks.dat"
     FONT = cv2.FONT_HERSHEY_SIMPLEX
+
     # Variables
     left_eye_thresh = 100
     right_eye_thresh = 100
+
     # Objects
     calibrate = Calibration()
     movement = Movement()
     blink = Blink()
+
     # Set frames
     calibrate.set_cal_frames(CALIBRATION_FRAMES)
     movement.set_eye_direction_frame(EYE_DIRECTION_FRAME)
     blink.set_closed_eye_frame(CLOSED_EYES_FRAME)
+    
     # Main
     try:
         cap = cv2.VideoCapture(0)  # initialize camera
@@ -51,13 +55,21 @@ if __name__ == "__main__":
                     x, y = face.left(), face.top()
                     x1, y1 = face.right(), face.bottom()
                     cv2.rectangle(frame, (x, y), (x1, y1), (0, 255, 0), 2)
-                    landmarks = predictor(gray, face)  # detect landmarks on face
+
+                    # Detect landmarks
+                    landmarks = predictor(gray, face)  
+
+                    # object for left and right eye
                     left_eye = Eye(frame, 'left', landmarks)  # detect left eye
                     right_eye = Eye(frame, 'right', landmarks)  # detect right eye
+
                     # Detect blinking
                     left_eye_ratio = left_eye.blink_ratio()  # get left eye blink ratio
                     right_eye_ratio = right_eye.blink_ratio()  # get right eye blink ratio
-                    blinking_ratio = (left_eye_ratio + right_eye_ratio) / 2  # get average blink ratio
+                    # blinking_ratio = (left_eye_ratio + right_eye_ratio) / 2  # get average blink ratio
+                    
+                    blinking_ratio= Eye.get_average_blink_ratio(left_eye, right_eye)  # get average blink ratio
+
                     blink.set_blink_ratio(blinking_ratio)  # set blink ratio to Blink class
                     blink.set_blinking_threshold(
                         calibrate.get_cal_blink_threshold())  # set blink threshold to Blink class
