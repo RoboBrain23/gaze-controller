@@ -41,8 +41,16 @@ class Eye:
         :return: middle point (x,y)
         """
 
-        return int((p1[0] + p2[0]) / 2), int((p1[1] + p2[1]) / 2)
+        return (int((p1[0] + p2[0]) / 2), int((p1[1] + p2[1]) / 2))
 
+    @staticmethod
+    def mid_point_v2(p1,p2):
+        """
+        Get the middle point (x,y) between two points.  
+
+        """
+        return (int((p1.x + p2.x) / 2), int((p1.y + p2.y) / 2))
+    
     def get_eye_region(self):
         """
         Get Eye region from points of the eye region and return it as numpy array of points (x,y).

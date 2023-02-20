@@ -22,6 +22,7 @@ if __name__ == "__main__":
     FONT = cv2.FONT_HERSHEY_SIMPLEX
     LEFTOBROW= [22,23,24,25,26]     # Brow feature
     RIGHTOBROW= [17,18,19,20,21]    # Brow feature
+    CENTER_COUNTER = 0
 
     # Variables
     left_eye_thresh = 100
@@ -67,16 +68,17 @@ if __name__ == "__main__":
                     right_brow_region = np.array([(landmarks.part(point).x, landmarks.part(point).y) for point in RIGHTOBROW]).astype(np.int32)
                     cv2.polylines(frame, [right_brow_region], True, 255,2 )
                     
-                    # top_eye_point = Eye.mid_point(landmarks.part(46),landmarks.part(47))
-                    # to_brow_point = (landmarks.part(24).x,landmarks.part(24).y)
-                    # brow_distance = hypot(to_brow_point[0]-top_eye_point[0],
-                    #                             to_brow_point[1]-top_eye_point[1])
-                    # if brow_distance >=57:
-                    #     CENTER_COUNTER +=1
-                    #     # cv2.putText(frame, "STATE : CENTER", (50, 100), FONT, 1, (0, 0, 255), 3)   
-                    #     if CENTER_COUNTER>EYE_DIRECTION_FRAME:
-                    #         CENTER_COUNTER =0
-                    #         print('forward')
+
+                    top_eye_point = Eye.mid_point_v2(landmarks.part(46),landmarks.part(47))
+                    # print(top_eye_point[0], top_eye_point[1])
+                    top_brow_point = (landmarks.part(24).x,landmarks.part(24).y)
+                    brow_distance = hypot(top_brow_point[0]-top_eye_point[0], top_brow_point[1]-top_eye_point[1])
+                    if brow_distance >=57:
+                        CENTER_COUNTER +=1
+                        # cv2.putText(frame, "STATE : CENTER", (50, 100), FONT, 1, (0, 0, 255), 3)   
+                        if CENTER_COUNTER>EYE_DIRECTION_FRAME:
+                            CENTER_COUNTER =0
+                            print('forward')
 
                     # object for left and right eye
                     left_eye = Eye(frame, 'left', landmarks)  # detect left eye
@@ -116,17 +118,17 @@ if __name__ == "__main__":
                         # Run the driver
                         movement.set_total_blinks(total_blinks)
                         movement.set_gaze_ratio(gaze_ratio)
-                        # movement.driver()
+                        movement.driver()
 
-                        # # Show the driver messages on the screen 
-                        # if movement.is_forward():
-                        #     cv2.putText(frame, "FORWARD", (50, 100), FONT, 1, (0, 0, 255), 3)  # show forward message
-                        # elif movement.is_left():
-                        #     cv2.putText(frame, "LEFT", (50, 100), FONT, 1, (0, 0, 255), 3) # show left message
-                        # elif movement.is_right():
-                        #     cv2.putText(frame, "RIGHT", (50, 100), FONT, 1, (0, 0, 255), 3)  # show right message
-                        # elif movement.is_stopped():
-                        #     cv2.putText(frame, "STOP", (50, 100), FONT, 1, (0, 0, 255), 3) # show stop message
+                        # Show the driver messages on the screen 
+                        if movement.is_forward():
+                            cv2.putText(frame, "FORWARD", (50, 100), FONT, 1, (0, 0, 255), 3)  # show forward message
+                        elif movement.is_left():
+                            cv2.putText(frame, "LEFT", (50, 100), FONT, 1, (0, 0, 255), 3) # show left message
+                        elif movement.is_right():
+                            cv2.putText(frame, "RIGHT", (50, 100), FONT, 1, (0, 0, 255), 3)  # show right message
+                        elif movement.is_stopped():
+                            cv2.putText(frame, "STOP", (50, 100), FONT, 1, (0, 0, 255), 3) # show stop message
                 cv2.imshow('frame', frame)
                 # cv2.imshow('mask',mask)
 
