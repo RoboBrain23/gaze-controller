@@ -64,10 +64,6 @@ if __name__ == "__main__":
                     right_eye = Eye(frame, 'right', landmarks)  # detect right eye
 
                     # Detect blinking
-                    left_eye_ratio = left_eye.blink_ratio()  # get left eye blink ratio
-                    right_eye_ratio = right_eye.blink_ratio()  # get right eye blink ratio
-                    # blinking_ratio = (left_eye_ratio + right_eye_ratio) / 2  # get average blink ratio
-                    
                     blinking_ratio= Eye.get_average_blink_ratio(left_eye, right_eye)  # get average blink ratio
 
                     blink.set_blink_ratio(blinking_ratio)  # set blink ratio to Blink class
