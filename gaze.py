@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 
 class Gaze:
@@ -85,6 +86,19 @@ class Gaze:
             gaze_ratio = 4
 
         return gaze_ratio
+
+    @staticmethod
+    def get_avg_gaze_ratio(gaze_right, gaze_left):
+        """
+        Get average gaze ratio value from two eyes.
+
+        :param gaze_right: gaze ratio value of right eye
+
+        :param gaze_left: gaze ratio value of left eye
+
+        :return: average gaze ratio value
+        """
+        return math.ceil(gaze_right.get_gaze_ratio() + gaze_left.get_gaze_ratio()) / 2
 
     def get_min_max_eye_region(self):
         """

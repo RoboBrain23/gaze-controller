@@ -69,17 +69,20 @@ if __name__ == "__main__":
                     blink.set_blink_ratio(blinking_ratio)  # set blink ratio to Blink class
                     blink.set_blinking_threshold(
                         calibrate.get_cal_blink_threshold())  # set blink threshold to Blink class
+                    
                     # Detect eye Gaze
                     gaze_right = Gaze(right_eye.get_eye_region(), mask, gray)  # detect right eye gaze
                     gaze_right.set_threshold(calibrate.get_cal_right_eye_thresh())  # change right eye threshold
                     gaze_left = Gaze(left_eye.get_eye_region(), mask, gray)  # detect left eye gaze
                     gaze_left.set_threshold(calibrate.get_cal_left_eye_thresh())  # change left eye threshold
+                    
                     # Calibrate
                     calibrate.calibrate(gaze_left, gaze_right, blinking_ratio)
                     if calibrate.is_cal_threshold():
                         cv2.putText(frame, "Calibrating Threshold", (150, 50), FONT, 1, (200, 0, 200), 2)  # show Calibrating Threshold message
                     elif calibrate.is_cal_blink():
                         cv2.putText(frame, "Calibrating Blinking", (150, 50), FONT, 1, (200, 0, 200), 2)  # show Calibrating Blinking message
+                    
                     # Check if calibration is done and start the driver
                     if calibrate.is_calibrated():
                         total_blinks = blink.count_blinks()  # Count total blinks
@@ -89,11 +92,14 @@ if __name__ == "__main__":
 
                         cv2.putText(frame, f'Total Blinks: {total_blinks}', (50, 350), FONT, 2, (0, 0, 255), 3)  # show total blinks
                         # Get total gaze ratio by averaging the left and right eye gaze ratio
-                        gaze_ratio = math.ceil((gaze_right.get_gaze_ratio() + gaze_left.get_gaze_ratio()) / 2)
+                        gaze_ratio= Gaze.get_avg_gaze_ratio(gaze_right, gaze_left)
+
                         # Run the driver
                         movement.set_total_blinks(total_blinks)
                         movement.set_gaze_ratio(gaze_ratio)
                         movement.driver()
+
+                        # Show the driver messages on the screen 
                         if movement.is_forward():
                             cv2.putText(frame, "FORWARD", (50, 100), FONT, 1, (0, 0, 255), 3)  # show forward message
                         elif movement.is_left():

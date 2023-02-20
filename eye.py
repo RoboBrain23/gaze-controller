@@ -73,7 +73,6 @@ class Eye:
             ratio = 0
         return ratio
 
-    # calulate average blinking ratio of both eyes
     @staticmethod
     def get_average_blink_ratio(left_eye, right_eye):
         """
