@@ -16,6 +16,8 @@ class Movement:
         self.__is_forward = False
         self.__gaze_ratio = 4
         self.__is_running = False
+        self.__isUp = False
+        self.__up_counter = 0
 
     def run(self):
         """
@@ -48,6 +50,23 @@ class Movement:
             else:
                 self.stop()
 
+    def driver2(self):
+        """
+        Driver function to control the movement.
+
+        :return: None
+        """
+        self.run()
+        if self.__is_running:
+            if self.__isUp == True:
+                self.move_up()
+            elif self.__gaze_ratio == 0:
+                self.move_left()
+            elif self.__gaze_ratio == 2:
+                self.move_right()
+            else:
+                self.stop()
+
     def move_counter_reset(self):
         """
         Reset direction counters to 0 for a certain number of frames and not blinking.
@@ -57,6 +76,7 @@ class Movement:
         self.__right_counter = 0
         self.__left_counter = 0
         self.__center_counter = 0
+        self.__up_counter = 0
 
     def move_forward(self):
         """
@@ -71,6 +91,17 @@ class Movement:
         if self.__center_counter > self.__eye_direction_frame:
             self.stop()
             print('Forward')
+
+    def move_up(self):
+        """
+        Move up if the eye brows are raised for a certain number of frames and not blinking.
+        """
+        self.__isUp = True
+        self.__up_counter += 1
+        # cv2.putText(frame, "STATE : FORWARD", (50, 100), FONT, 1, (0, 0, 255), 3)
+        if self.__up_counter > self.__eye_direction_frame:
+            self.stop()
+            print('up')
 
     def move_left(self):
         """
@@ -120,6 +151,20 @@ class Movement:
         """
         self.__gaze_ratio = gaze_ratio
 
+    def set_brow_status(self, brows_status):
+        """
+        return true if brows are raised
+        """
+        self.__isUp = brows_status
+
+    def is_up(self):
+        """
+        Return if it is up or not
+
+        :return: is_up
+        """
+        return self.__isUp
+        
     def is_forward(self):
         """
         Return if it is forward or not
