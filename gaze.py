@@ -82,7 +82,7 @@ class Gaze:
             gaze_ratio = 1
         # down (stop)
         else:
-            gaze_ratio = 4
+            gaze_ratio = None
 
         return gaze_ratio
 
