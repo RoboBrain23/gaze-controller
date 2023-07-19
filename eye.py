@@ -73,23 +73,6 @@ class Eye:
             ratio = 0
         return ratio
 
-    # calulate average blinking ratio of both eyes
-    @staticmethod
-    def get_average_blink_ratio(left_eye, right_eye):
-        """
-        Get average blinking ratio of both eyes.
-
-        :param left_eye: left eye object
-
-        :param right_eye: right eye object
-
-        :return: average blinking ratio
-        """
-        left_eye_ratio = left_eye.blink_ratio()
-        right_eye_ratio = right_eye.blink_ratio()
-        average_ratio = (left_eye_ratio + right_eye_ratio) / 2
-        return average_ratio
-
     def get_eye_width(self):
         """
         Get Width of Eye by taking the euclidean distance between the horizontal eye landmarks.
