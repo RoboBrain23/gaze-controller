@@ -30,3 +30,10 @@ To run the gaze tracking system, simply run the `main.py` file:
 ```
 python main.py
 ```
+### Contributions
+
+Contributions to this project are welcome! If you find any issues or have suggestions for improvements, feel free to open a [GitHub Issue](https://github.com/RoboBrain23/gaze-controller/issues) or submit a pull request.
+
+### License
+
+This project is licensed under the [MIT License](./LICENSE). Feel free to use and modify the code for your needs while respecting the terms of the license.
